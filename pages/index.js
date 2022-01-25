@@ -1,71 +1,50 @@
 import appConfig from '../config.json';
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
+import React from 'react';
+import { useRouter } from 'next/router';
+import react from 'react';
 
-function GlobalStyle() {
-    return (
-        <style global jsx>{`
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            list-style: none;
-          }
-          body {
-            font-family: 'Open Sans', sans-serif;
-          }
-          /* App fit Height */ 
-          html, body, #__next {
-            min-height: 100vh;
-            display: flex;
-            flex: 1;
-          }
-          #__next {
-            flex: 1;
-          }
-          #__next > * {
-            flex: 1;
-          }
-          /* ./App fit Height */ 
-        `}</style>
-      );
-}
 
 function Title(props){
-    const Tag = props.tag || 'h1';
+  const Tag = props.tag || 'h1';
 
-    return(  
-        <>
-            <Tag>{props.children}</Tag>
-            <style jsx>{`
-                ${Tag} {
-                color: ${appConfig.theme.colors.neutrals['000']};
-                font-size: 24px;
-                font-weight: 600;
-            }
-            `}</style>
-        </>
-    )
+  return(
+    <>
+      <Tag>{props.children}</Tag>
+      <style jsx>{`
+        ${Tag}{
+          font-size: 24px;
+          font-weight: 600;
+          color: ${appConfig.theme.colors.neutrals['000']};
+        }
+      `}</style>
+    </>
+  )
 }
 
-// Componente React
-// function HomePage() {
-//     // JSX
-//     return (
-//         <div>
-//             <GlobalStyle />
-//             <Titulo tag="h2">Boas vindas de volta!</Titulo>
-//             <h2>Discord - Alura Matrix</h2>
-//         </div>
-//     )
-// }
-// export default HomePage
-
-export default function PaginaInicial() {
-  const username = 'Clara-Ro';
+export default function HomePage() {
+  //const username = 'Clara-Ro';
+  const [username, setUsername]= React.useState('');
+  const route = useRouter();
+  const [name, setName] = React.useState('');
+  
+  React.useEffect(()=>{
+    if(username.length>2){
+      const url= `https://api.github.com/users/${username}`
+      fetch(url).then((res)=>{
+        res.json().then((data)=>{
+          console.log(data)
+          const {name}= data
+          setName(name)
+        })
+      }).catch((error)=>{
+        console.log(error)
+      })
+    }
+  },[username])
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -91,7 +70,11 @@ export default function PaginaInicial() {
         >
           {/* Formulário */}
           <Box
-            as="form"
+            as='form'
+            onSubmit={function(infoevent){
+              infoevent.preventDefault();
+              route.push('/chat')
+            }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -103,6 +86,12 @@ export default function PaginaInicial() {
             </Text>
 
             <TextField
+             value= {username}
+             onChange={function (event) {
+               const value = event.target.value;
+               //Trocar o valor da variavel
+               setUsername(value);
+              }}
               fullWidth
               textFieldColors={{
                 neutral: {
@@ -129,7 +118,7 @@ export default function PaginaInicial() {
 
 
           {/* Photo Area */}
-          <Box
+          <Box 
             styleSheet={{
               display: 'flex',
               flexDirection: 'column',
@@ -149,7 +138,10 @@ export default function PaginaInicial() {
                 borderRadius: '50%',
                 marginBottom: '16px',
               }}
-              src={`https://github.com/${username}.png`}
+              src={
+                username.length>2 ? `https://github.com/${username}.png`
+                : 'https://i.pinimg.com/736x/d8/c4/14/d8c4147b34116e801aa18d329719284a.jpg'
+                }
             />
             <Text
               variant="body4"
@@ -157,10 +149,12 @@ export default function PaginaInicial() {
                 color: appConfig.theme.colors.neutrals[200],
                 backgroundColor: appConfig.theme.colors.neutrals[900],
                 padding: '3px 10px',
-                borderRadius: '1000px'
+                borderRadius: '1000px',
+                textAlign:'center'
               }}
             >
-              {username}
+              {username.length > 2 ? username: ""}  <br/>
+              {name ? name:username.length > 2 ? username: "" }
             </Text>
           </Box>
           {/* Photo Area */}
