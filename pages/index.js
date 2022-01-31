@@ -68,12 +68,13 @@ export default function HomePage() {
             backgroundColor: appConfig.theme.colors.neutrals[700],
           }}
         >
+
           {/* Formulário */}
           <Box
             as='form'
             onSubmit={function(infoevent){
               infoevent.preventDefault();
-              route.push('/chat')
+              route.push(`/chat?username=${username}`)
             }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
